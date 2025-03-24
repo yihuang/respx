@@ -327,7 +327,7 @@ class Route:
         return effect
 
     def _call_side_effect(
-        self, effect: CallableSideEffect, request: httpx.Request, **kwargs: Any
+            self, effect: CallableSideEffect, request: httpx.Request, is_async: bool, **kwargs: Any
     ) -> RouteResultTypes:
         # Add route kwarg if the side effect wants it
         argspec = inspect.getfullargspec(effect)
@@ -338,7 +338,7 @@ class Route:
 
         try:
             # Call side effect
-            result: RouteResultTypes = effect(request, **kwargs)
+            result: RouteResultTypes = effect(request, is_async, **kwargs)
         except Exception as error:
             raise SideEffectError(self, origin=error) from error
 
@@ -357,7 +357,7 @@ class Route:
         return result
 
     def _resolve_side_effect(
-        self, request: httpx.Request, **kwargs: Any
+            self, request: httpx.Request, is_async: bool, **kwargs: Any
     ) -> RouteResultTypes:
         effect = self._next_side_effect()
 
@@ -379,17 +379,17 @@ class Route:
 
         # Handle `Callable` side effect
         elif callable(effect):
-            result = self._call_side_effect(effect, request, **kwargs)
+            result = self._call_side_effect(effect, request, is_async, **kwargs)
             return result
 
         # Resolved effect is a mocked response
         return effect
 
-    def resolve(self, request: httpx.Request, **kwargs: Any) -> RouteResultTypes:
+    def resolve(self, request: httpx.Request, is_async: bool, **kwargs: Any) -> RouteResultTypes:
         result: RouteResultTypes = None
 
         if self._side_effect:
-            result = self._resolve_side_effect(request, **kwargs)
+            result = self._resolve_side_effect(request, is_async, **kwargs)
             if result is None:
                 return None  # Side effect resolved as a non-matching route
 
@@ -406,7 +406,7 @@ class Route:
 
         return result
 
-    def match(self, request: httpx.Request) -> RouteResultTypes:
+    def match(self, request: httpx.Request, is_async: bool) -> RouteResultTypes:
         """
         Matches and resolves request with given patterns and optional side effect.
 
@@ -424,7 +424,7 @@ class Route:
         if self._pass_through:
             return request
 
-        result = self.resolve(request, **context)
+        result = self.resolve(request, is_async, **context)
         return result
 
 

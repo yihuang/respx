@@ -276,7 +276,7 @@ class Router:
     def resolve(self, request: httpx.Request) -> ResolvedRoute:
         with self.resolver(request) as resolved:
             for route in self.routes:
-                prospect = route.match(request)
+                prospect = route.match(request, False)
                 if prospect is not None:
                     resolved.route = route
                     resolved.response = cast(ResolvedResponseTypes, prospect)
@@ -290,7 +290,7 @@ class Router:
     async def aresolve(self, request: httpx.Request) -> ResolvedRoute:
         with self.resolver(request) as resolved:
             for route in self.routes:
-                prospect: RouteResultTypes = route.match(request)
+                prospect: RouteResultTypes = route.match(request, True)
 
                 # Await async side effect and wrap any exception
                 if inspect.isawaitable(prospect):
