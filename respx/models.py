@@ -333,6 +333,8 @@ class Route:
         argspec = inspect.getfullargspec(effect)
         if "route" in kwargs:
             warn(f"Matched context contains reserved word `route`: {self.pattern!r}")
+        if "is_async" in kwargs:
+            warn(f"Matched context contains reserved word `is_async`: {self.pattern!r}")
         if "route" in argspec.args:
             kwargs["route"] = self
         if "is_async" in argspec.args:
