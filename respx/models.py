@@ -327,7 +327,7 @@ class Route:
         return effect
 
     def _call_side_effect(
-            self, effect: CallableSideEffect, request: httpx.Request, is_async: bool, **kwargs: Any
+        self, effect: CallableSideEffect, request: httpx.Request, is_async: bool, **kwargs: Any
     ) -> RouteResultTypes:
         # Add route kwarg if the side effect wants it
         argspec = inspect.getfullargspec(effect)
@@ -335,10 +335,12 @@ class Route:
             warn(f"Matched context contains reserved word `route`: {self.pattern!r}")
         if "route" in argspec.args:
             kwargs["route"] = self
+        if "is_async" in argspec.args:
+            kwargs["is_async"] = is_async
 
         try:
             # Call side effect
-            result: RouteResultTypes = effect(request, is_async, **kwargs)
+            result: RouteResultTypes = effect(request, **kwargs)
         except Exception as error:
             raise SideEffectError(self, origin=error) from error
 
