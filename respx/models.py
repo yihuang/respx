@@ -327,7 +327,7 @@ class Route:
         return effect
 
     def _call_side_effect(
-        self, effect: CallableSideEffect, request: httpx.Request, is_async: bool, **kwargs: Any
+        self, effect: CallableSideEffect, request: httpx.Request, /, is_async: bool, **kwargs: Any
     ) -> RouteResultTypes:
         # Add route kwarg if the side effect wants it
         argspec = inspect.getfullargspec(effect)
@@ -361,7 +361,7 @@ class Route:
         return result
 
     def _resolve_side_effect(
-            self, request: httpx.Request, is_async: bool, **kwargs: Any
+            self, request: httpx.Request, /, is_async: bool, **kwargs: Any
     ) -> RouteResultTypes:
         effect = self._next_side_effect()
 
@@ -389,7 +389,7 @@ class Route:
         # Resolved effect is a mocked response
         return effect
 
-    def resolve(self, request: httpx.Request, is_async: bool, **kwargs: Any) -> RouteResultTypes:
+    def resolve(self, request: httpx.Request, /, is_async: bool, **kwargs: Any) -> RouteResultTypes:
         result: RouteResultTypes = None
 
         if self._side_effect:
@@ -410,7 +410,7 @@ class Route:
 
         return result
 
-    def match(self, request: httpx.Request, is_async: bool) -> RouteResultTypes:
+    def match(self, request: httpx.Request, /, is_async: bool) -> RouteResultTypes:
         """
         Matches and resolves request with given patterns and optional side effect.
 
